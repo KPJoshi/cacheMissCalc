@@ -5,21 +5,21 @@ import islpy as isl
 nBlocks = 64 #no. of cache blocks
 blockSz = 64 #size of block in bytes
 
-dims = 2
+dims = 1
 params = 0
-references = 1
+references = 2
 
 #constraints on the domain
 #it is expected that the iteration dimensions are i0, i1, ... and the parameters are p0, p1, ...
-domain = [{'i0': 0},{'i0': -1, 1: 127},{'i1': 0},{'i1': -1, 1: 127}]
+domain = [{'i0': 1},{'i0': -1, 1: 1023}]
 
 #schedule is expected to be lexicographic in i0,i1,... and order of specification of the statements
 
 #memory location accessed by each reference
 #representing a linear expression to calculate the memory location accessed by the reference
 refMem = ([
-		  {'i0': 512, 'i1': 4}, #a[i][j]
-		  #{'i0': 512, 'i1': 4, 1: 65536}, #b[i][j]
+		  {'i0': 4},
+		  {'i0': 4, 1: 4096},
 ])
 
 # END data to be entered by user
@@ -51,7 +51,7 @@ def createGTConstraint(expr1,expr2,gtIsStrict):
 
 #add lexicographic constraints to input set
 #note that set is passed by reference and is modified
-def addLexConstraint(set,greater,lesser,stmt1,stmt2):
+def addLexConstraint(set,greater,lesser,stmt1Idx,stmt2Idx):
 	finalSet = isl.Set.empty(set.get_space())
 	for i in range(dims):
 		setc = set.copy()
@@ -59,7 +59,7 @@ def addLexConstraint(set,greater,lesser,stmt1,stmt2):
 		finalSet = finalSet.union(setc)
 		set = set.add_constraint(isl.Constraint.eq_from_names(space,{greater+str(i): 1, lesser+str(i): -1}))
 	#allow exactly same lexicographically depending on static statement occurence
-	if stmt1>stmt2:
+	if stmt1Idx>stmt2Idx:
 		finalSet = finalSet.union(set)
 	return finalSet
 
@@ -104,6 +104,8 @@ setLv0Cpy = (setLv0
 			 .add_constraint(isl.Constraint.eq_from_names(space,{'d': 1, 'e': -1})))
 setLv0 = setLv0.subtract(setLv0Cpy)
 
+#print 'setLv0:\n', setLv0
+
 for i in range(references):
 	#create and add constraint that reference at i maps to cache block s, with free parameter d
 	lowerConstr = createGTConstraint(refMem[i],{'d': nBlocks*blockSz, 's': blockSz},False)
@@ -111,21 +113,23 @@ for i in range(references):
 	setLv1 = (setLv0
 			  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
 			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr)))
+	#print 'setLv1 ', i, ':\n', setLv1
 	for j in range(references):
 		#create and add constraint that reference at j maps to cache block s, with free parameter e
-		lowerConstr = createGTConstraint(cvtConstrIters(refMem[i],'i','j'),{'e': nBlocks*blockSz, 's': blockSz},False)
-		upperConstr = createGTConstraint({'e': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[i],'i','j'),True)
+		lowerConstr = createGTConstraint(cvtConstrIters(refMem[j],'i','j'),{'e': nBlocks*blockSz, 's': blockSz},False)
+		upperConstr = createGTConstraint({'e': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[j],'i','j'),True)
 		setLv2 = (setLv1
 				  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
 				  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr)))
 		#add lex constraint: j<i
 		setLv2 = addLexConstraint(setLv2,'i','j',i,j)
+		#print 'setLv2 ', i, j, ':\n', setLv2
 		setLv2Temp = isl.Set.empty(space)
 		for k in range(references):
 			setLv3 = setLv2.copy()
 			#create and add constraint that reference at k maps to cache block s, with free parameter d
-			lowerConstr = createGTConstraint(cvtConstrIters(refMem[i],'i','k'),{'d': nBlocks*blockSz, 's': blockSz},False)
-			upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[i],'i','k'),True)
+			lowerConstr = createGTConstraint(cvtConstrIters(refMem[k],'i','k'),{'d': nBlocks*blockSz, 's': blockSz},False)
+			upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[k],'i','k'),True)
 			setLv3 = (setLv3
 					  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
 					  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr)))
