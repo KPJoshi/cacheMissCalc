@@ -58,10 +58,12 @@ def addLexConstraint(set,greater,lesser,stmt1Idx,stmt2Idx):
 		setc = setc.add_constraint(isl.Constraint.ineq_from_names(space,{greater+str(i): 1, lesser+str(i): -1, 1: -1}))
 		finalSet = finalSet.union(setc)
 		set = set.add_constraint(isl.Constraint.eq_from_names(space,{greater+str(i): 1, lesser+str(i): -1}))
-	#allow exactly same lexicographically depending on static statement occurence
-	if stmt1Idx>stmt2Idx:
-		finalSet = finalSet.union(set)
 	return finalSet
+
+#add 1 dimension that represents order of statements
+domain.append({'i'+str(dims): 1})
+domain.append({'i'+str(dims): -1, 1: references-1})
+dims += 1
 
 #create dimension names
 dNameSet=[]
@@ -112,7 +114,8 @@ for i in range(references):
 	upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},refMem[i],True)
 	setLv1 = (setLv0
 			  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
-			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr)))
+			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
+			  .add_constraint(isl.Constraint.eq_from_names(space, {'i'+str(dims-1): 1, 1: -i})))
 	#print 'setLv1 ', i, ':\n', setLv1
 	for j in range(references):
 		#create and add constraint that reference at j maps to cache block s, with free parameter e
@@ -120,7 +123,8 @@ for i in range(references):
 		upperConstr = createGTConstraint({'e': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[j],'i','j'),True)
 		setLv2 = (setLv1
 				  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
-				  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr)))
+				  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
+				  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
 		#add lex constraint: j<i
 		setLv2 = addLexConstraint(setLv2,'i','j',i,j)
 		#print 'setLv2 ', i, j, ':\n', setLv2
@@ -132,7 +136,8 @@ for i in range(references):
 			upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[k],'i','k'),True)
 			setLv3 = (setLv3
 					  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
-					  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr)))
+					  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
+					  .add_constraint(isl.Constraint.eq_from_names(space, {'k'+str(dims-1): 1, 1: -k})))
 			setLv3 = addLexConstraint(setLv3,'i','k',i,k)
 			setLv3 = addLexConstraint(setLv3,'k','j',k,j)
 			setLv2Temp = setLv2Temp.union(setLv3)
