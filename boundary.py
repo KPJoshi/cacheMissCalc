@@ -111,6 +111,7 @@ for i in range(references):
 			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 			  .add_constraint(isl.Constraint.eq_from_names(space, {'i'+str(dims-1): 1, 1: -i})))
 	#print 'setLv1', i, ':\n', setLv1
+	setLv1Temp = isl.Set.empty(space)
 	for j in range(references):
 		#add lex constraint: j<i
 		setLv2 = setLv1.copy()
@@ -125,27 +126,12 @@ for i in range(references):
 				  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 				  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
 		#print 'setLv2 (1)', i, j, ':\n', setLv2
-		setLv2Temp = isl.Set.empty(space)
-		for k in range(references):
-			setLv3 = setLv2.copy()
-			#add lex constraint: j<k<i
-			setLv3 = addLexConstraint(setLv3,'i','k')
-			setLv3 = addLexConstraint(setLv3,'k','j')
-			#create and add constraint that reference at k maps to cache block s, with free parameter d
-			lowerConstr = createGTConstraint(cvtConstrIters(refMem[k],'i','k'),{'d': nBlocks*blockSz, 's': blockSz},False)
-			upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[k],'i','k'),True)
-			#print 'lc', lowerConstr, 'uc', upperConstr
-			setLv3 = (setLv3
-					  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
-					  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
-					  .add_constraint(isl.Constraint.eq_from_names(space, {'k'+str(dims-1): 1, 1: -k})))
-			#print 'setLv3', i, j, k, ':\n', setLv3
-			setLv2Temp = setLv2Temp.union(setLv3)
-		setLv2 = setLv2.project_out(isl.dim_type.set,dims*2+3,dims)
-		setLv2Temp = setLv2Temp.project_out(isl.dim_type.set,dims*2+3,dims)
-		setLv2 = setLv2.subtract(setLv2Temp)
-		finalSet = finalSet.union(setLv2)
+		setLv1Temp = setLv1Temp.union(setLv2)
+	setLv1 = setLv1.project_out(isl.dim_type.set,dims+3,dims)
+	setLv1Temp = setLv1Temp.project_out(isl.dim_type.set,dims+3,dims)
+	setLv1 = setLv1.subtract(setLv1Temp)
+	finalSet = finalSet.union(setLv1)
 
-finalSet = finalSet.project_out(isl.dim_type.set,dims,dims+3)
+finalSet = finalSet.project_out(isl.dim_type.set,dims,3)
 
 print finalSet
