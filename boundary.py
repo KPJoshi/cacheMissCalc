@@ -87,7 +87,7 @@ for i in range(references):
 			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 			  .add_constraint(isl.Constraint.eq_from_names(space, {'i'+str(dims-1): 1, 1: -i})))
 	#print 'setLv1', i, ':\n', setLv1
-	setLv1Temp = isl.Set.empty(space)
+	setLv2Agg = isl.Set.empty(space)
 	setLv2Template = setLv1.copy()
 	#add lex constraint: j<i
 	setLv2Template = addLexConstraint(setLv2Template,'i','j')
@@ -103,10 +103,10 @@ for i in range(references):
 				  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 				  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
 		#print 'setLv2 (1)', i, j, ':\n', setLv2
-		setLv1Temp = setLv1Temp.union(setLv2)
+		setLv2Agg = setLv2Agg.union(setLv2)
 	setLv1 = setLv1.project_out(isl.dim_type.set,dims+3,dims)
-	setLv1Temp = setLv1Temp.project_out(isl.dim_type.set,dims+3,dims)
-	setLv1 = setLv1.subtract(setLv1Temp)
+	setLv2Agg = setLv2Agg.project_out(isl.dim_type.set,dims+3,dims)
+	setLv1 = setLv1.subtract(setLv2Agg)
 	finalSet = finalSet.union(setLv1)
 
 finalSet = finalSet.project_out(isl.dim_type.set,dims,3)
