@@ -1,30 +1,6 @@
 import islpy as isl
 
-# BEGIN data to be entered by user
-
-nBlocks = 64 #no. of cache blocks
-blockSz = 64 #size of block in bytes
-
-dims = 1
-params = 1
-references = 2
-
-#user constants
-
-#constraints on the domain
-#it is expected that the iteration dimensions are i0, i1, ... and the parameters are p0, p1, ...
-domain = [{'i0': 1},{'i0': -1, 'p0': 1, 1: -1},{'p0': 1},{'p0': -1, 1: 1023}]
-
-#schedule is expected to be lexicographic in i0,i1,... and order of specification of the statements
-
-#memory location accessed by each reference
-#representing a linear expression to calculate the memory location accessed by the reference
-refMem = ([
-		  {'i0': 4}, #a[i]
-		  {'i0': 4, 'p0': 4}, #b[i]
-])
-
-# END data to be entered by user
+from input import *
 
 #convert constraint's iterators to a different one
 #returns a modified COPY of the original
