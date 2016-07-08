@@ -157,4 +157,7 @@ for i in range(references):
 
 finalSet = finalSet.project_out(isl.dim_type.set,dims,dims+3)
 
+#optional step: simplify the set representation - increases processing time
+finalSet = finalSet.coalesce()
+
 print finalSet
