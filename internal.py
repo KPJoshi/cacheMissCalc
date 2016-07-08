@@ -95,11 +95,11 @@ for i in range(references):
 			  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
 			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 			  .add_constraint(isl.Constraint.eq_from_names(space, {'i'+str(dims-1): 1, 1: -i})))
+	setLv1 = addLexConstraint(setLv1,'i','j')
 	#print 'setLv1', i, ':\n', setLv1
 	for j in range(references):
 		#add lex constraint: j<i
 		setLv2 = setLv1.copy()
-		setLv2 = addLexConstraint(setLv2,'i','j')
 		#print 'setLv2 (0)', i, j, ':\n', setLv2
 		#create and add constraint that reference at j maps to cache block s, with free parameter e
 		lowerConstr = createGTConstraint(cvtConstrIters(refMem[j],'i','j'),{'e': nBlocks*blockSz, 's': blockSz},False)
@@ -111,11 +111,12 @@ for i in range(references):
 				  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
 		#print 'setLv2 (1)', i, j, ':\n', setLv2
 		setLv2Temp = isl.Set.empty(space)
+		setLv3Template = setLv2.copy()
+		#add lex constraint: j<k<i
+		setLv3Template = addLexConstraint(setLv3Template,'i','k')
+		setLv3Template = addLexConstraint(setLv3Template,'k','j')
 		for k in range(references):
-			setLv3 = setLv2.copy()
-			#add lex constraint: j<k<i
-			setLv3 = addLexConstraint(setLv3,'i','k')
-			setLv3 = addLexConstraint(setLv3,'k','j')
+			setLv3 = setLv3Template.copy()
 			#create and add constraint that reference at k maps to cache block s, with free parameter d
 			lowerConstr = createGTConstraint(cvtConstrIters(refMem[k],'i','k'),{'d': nBlocks*blockSz, 's': blockSz},False)
 			upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[k],'i','k'),True)

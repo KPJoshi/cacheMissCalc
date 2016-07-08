@@ -88,10 +88,11 @@ for i in range(references):
 			  .add_constraint(isl.Constraint.eq_from_names(space, {'i'+str(dims-1): 1, 1: -i})))
 	#print 'setLv1', i, ':\n', setLv1
 	setLv1Temp = isl.Set.empty(space)
+	setLv2Template = setLv1.copy()
+	#add lex constraint: j<i
+	setLv2Template = addLexConstraint(setLv2Template,'i','j')
 	for j in range(references):
-		#add lex constraint: j<i
-		setLv2 = setLv1.copy()
-		setLv2 = addLexConstraint(setLv2,'i','j')
+		setLv2 = setLv2Template.copy()
 		#print 'setLv2 (0)', i, j, ':\n', setLv2
 		#create and add constraint that reference at j maps to cache block s, with free parameter e
 		lowerConstr = createGTConstraint(cvtConstrIters(refMem[j],'i','j'),{'e': nBlocks*blockSz, 's': blockSz},False)
