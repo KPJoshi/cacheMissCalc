@@ -62,7 +62,7 @@ space = isl.Space.create_from_names(ctx,set=dNameSet,params=pNameSet)
 
 #the final main set to be created by combining several other sets
 finalSet = isl.Set.empty(space)
-finalSet = finalSet.project_out(isl.dim_type.set,dims+3,dims)
+finalSet = finalSet.project_out(isl.dim_type.set,dims+2,dims+1)
 
 #the initial working set with all the constraints that are common
 setLv0 = (isl.Set.universe(space)
@@ -104,12 +104,12 @@ for i in range(references):
 				  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
 		#print 'setLv2 (1)', i, j, ':\n', setLv2
 		setLv2Agg = setLv2Agg.union(setLv2)
-	setLv1 = setLv1.project_out(isl.dim_type.set,dims+3,dims)
-	setLv2Agg = setLv2Agg.project_out(isl.dim_type.set,dims+3,dims)
+	setLv1 = setLv1.project_out(isl.dim_type.set,dims+2,dims+1)
+	setLv2Agg = setLv2Agg.project_out(isl.dim_type.set,dims+2,dims+1)
 	setLv1 = setLv1.subtract(setLv2Agg)
 	finalSet = finalSet.union(setLv1)
 
-finalSet = finalSet.project_out(isl.dim_type.set,dims,3)
+finalSet = finalSet.project_out(isl.dim_type.set,dims,2)
 
 #optional step: simplify the set representation - increases processing time
 finalSet = finalSet.coalesce()
