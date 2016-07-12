@@ -1,0 +1,4 @@
+P:=
+#Paste output of python scripts here
+;
+card P;
