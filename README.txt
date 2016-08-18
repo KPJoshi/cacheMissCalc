@@ -10,13 +10,14 @@ Requirements:
 python and its dependencies
 islpy and its dependencies
 
-Instructions for using the python scripts
-1) Make a copy of input_template.py and name it input.py
-2) Edit input.py with your desired parameters
-3) Run internal.py to get the isl representation of a set containing all iteration points where internal cache misses occur
-4) Run boundary.py to get the isl representation of a set containing all iteration points where boundary cache misses occur
+Commands:
+./internal.py <inputfile> [outputmode]
+./boundary.py <inputfile> [outputmode]
 
-Instructions for using ISCC to count the number of cache misses
-1) Make a copy of iscc_input_template.py
-2) Insert the set representation into this copy at the location mentioned
-3) Run ISCC and pipe this file into its standard input
+The first script is for measuring guaranteed cache misses regardless of initial cache state
+The second script is for measuring the maximum number of possible cache misses dependent on the initial cache state
+inputfile is the input file
+outputmode is 'iscc' by default, produces output that can be directly piped into the ISCC calculator
+giving 'poly' (without quotes) as outputmode will just produce the polygon representing the cache misses
+
+Use input_template.py as an example to create the input file
