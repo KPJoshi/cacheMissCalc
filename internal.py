@@ -1,8 +1,17 @@
 #!/usr/bin/env python
 
-import islpy as isl
+import sys, islpy as isl
 
-from input import *
+#get input
+if(len(sys.argv)<2):
+	print 'Error: input file not supplied'
+	sys.exit(1)
+
+try:
+	execfile(sys.argv[1])
+except (IOError, SyntaxError):
+	print 'Error: missing or invalid input file'
+	sys.exit(1)
 
 #convert constraint's iterators to a different one
 #returns a modified COPY of the original
