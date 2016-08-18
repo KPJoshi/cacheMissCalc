@@ -3,7 +3,7 @@
 import sys, islpy as isl
 
 #get input
-if(len(sys.argv)<2):
+if len(sys.argv)<2:
 	print 'Error: input file not supplied'
 	sys.exit(1)
 
@@ -12,6 +12,11 @@ try:
 except (IOError, SyntaxError):
 	print 'Error: missing or invalid input file'
 	sys.exit(1)
+
+#get (optional) output mode
+outputMode = 'iscc'
+if len(sys.argv)>2 and sys.argv[2]=='poly':
+	outputMode = 'poly'
 
 #convert constraint's iterators to a different one
 #returns a modified COPY of the original
@@ -148,4 +153,7 @@ finalSet = finalSet.project_out(isl.dim_type.set,dims,dims+3)
 #optional step: simplify the set representation - increases processing time
 finalSet = finalSet.coalesce()
 
-print 'card', finalSet, ';'
+if outputMode=='iscc':
+	print 'card', finalSet, ';'
+else:
+	print finalSet

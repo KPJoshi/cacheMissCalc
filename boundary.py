@@ -13,6 +13,11 @@ except (IOError, SyntaxError):
 	print 'Error: missing or invalid input file'
 	sys.exit(1)
 
+#get (optional) output mode
+outputMode = 'iscc'
+if len(sys.argv)>2 and sys.argv[2]=='poly':
+	outputMode = 'poly'
+
 #convert constraint's iterators to a different one
 #returns a modified COPY of the original
 def cvtConstrIters(constr,itOrig,itNew):
@@ -125,4 +130,7 @@ finalSet = finalSet.project_out(isl.dim_type.set,dims,2)
 #optional step: simplify the set representation - increases processing time
 finalSet = finalSet.coalesce()
 
-print 'card', finalSet, ';'
+if outputMode=='iscc':
+	print 'card', finalSet, ';'
+else:
+	print finalSet
