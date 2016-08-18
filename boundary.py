@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import islpy as isl
 
 from input import *
@@ -114,4 +116,4 @@ finalSet = finalSet.project_out(isl.dim_type.set,dims,2)
 #optional step: simplify the set representation - increases processing time
 finalSet = finalSet.coalesce()
 
-print finalSet
+print 'card', finalSet, ';'
