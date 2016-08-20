@@ -102,6 +102,8 @@ for i in range(references):
 			  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
 			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 			  .add_constraint(isl.Constraint.eq_from_names(space, {'i'+str(dims-1): 1, 1: -i})))
+	for c in guards[i]:
+		setLv1 = setLv1.add_constraint(isl.Constraint.eq_from_names(space,c))
 	#print 'setLv1', i, ':\n', setLv1
 	setLv2Agg = isl.Set.empty(space)
 	setLv2Template = setLv1.copy()
@@ -118,6 +120,8 @@ for i in range(references):
 				  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
 				  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 				  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
+		for c in guards[j]:
+			setLv2 = setLv2.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(c,'i','j')))
 		#print 'setLv2 (1)', i, j, ':\n', setLv2
 		setLv2Agg = setLv2Agg.union(setLv2)
 	setLv1 = setLv1.project_out(isl.dim_type.set,dims+2,dims+1)
