@@ -1,12 +1,12 @@
 # Formula-Based Cache Miss Calculator
 
-By Keyur Joshi
+By Keyur Joshi  
 Indian Institute of Technology, Hyderabad
 
-Based on the following paper:
-*Exact Analysis of the Cache Behavior of Nested Loops*
-Siddhartha Chatterjee, Erin Parker, Philip J. Hanlon, Alvin R. Lebeck
-Published in PLDI 2001
+Based on the following paper:  
+*Exact Analysis of the Cache Behavior of Nested Loops*  
+Siddhartha Chatterjee, Erin Parker, Philip J. Hanlon, Alvin R. Lebeck  
+Published in PLDI 2001  
 ([link](http://dl.acm.org/citation.cfm?id=378859))
 
 ## Requirements
