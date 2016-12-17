@@ -60,10 +60,10 @@ for i in range(references):
 			  .add_constraint(isl.Constraint.eq_from_names(space, {'i'+str(dims-1): 1, 1: -i})))
 	for c in guards[i]:
 		setLv1 = setLv1.add_constraint(isl.Constraint.eq_from_names(space, c))
+	#add lex constraint: j<i
 	setLv1 = addLexConstraint(setLv1,'i','j')
 	#print 'setLv1', i, ':\n', setLv1
 	for j in range(references):
-		#add lex constraint: j<i
 		setLv2 = setLv1.copy()
 		#print 'setLv2 (0)', i, j, ':\n', setLv2
 		#create and add constraint that reference at j maps to cache block s, with free parameter e
