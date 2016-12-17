@@ -53,6 +53,6 @@ def addLexConstraint(set,greater,lesser):
 	return finalSet
 
 #add 1 dimension that represents order of statements
-domain.append({'i'+str(dims): 1})
-domain.append({'i'+str(dims): -1, 1: references-1})
+domain.append({'type':'in', 'i'+str(dims): 1})
+domain.append({'type':'in', 'i'+str(dims): -1, 1: references-1})
 dims += 1

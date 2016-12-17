@@ -12,19 +12,22 @@ params = 1 #no. of parameters
 references = 2 #no. of references to memory locations
 
 #user constants - use these instead of parameters if you want to use a specific value
+foo = 5
 
-#inequality constraints on the domain
+#constraints on the domain
 #it is expected that the iteration dimensions are i0, i1, ... and the parameters are p0, p1, ...
-#constraining parameters is highly recommended if possible
-domain = [{'i0': 1},{'i0': -1, 'p0': 1, 1: -1},{'p0': 1},{'p0': -1, 1: 1023}]
+#additionally, the 'type' should be included and should be 'in' for inequalities or 'eq' for equalities
+#constraining parameters is highly recommended
+domain = [{'type':'in', 'i0': 1},{'type':'in', 'i0': -1, 'p0': 1, 1: -1},{'type':'in', 'p0': 1},{'type':'in', 'p0': -1, 1: 1023}]
 
-#equality constraints on the domain of individual statements
-#must be a list of lists, one list for each statement, each list containing that statement's constraints
-#for use with imperfect loop nests, as statement guards
+#additional per-statement constraints
+#must be a list of lists, with one list for each statement, each list containing the respective statement's constraints
+#useful for representing simple imperfectly nested loops
 guards = [[],[]]
 
 #memory location accessed by each reference
 #representing a linear expression to calculate the memory location accessed by the reference
+#note - no 'type' required here - these are assumed to be equalities
 refMem = ([
 		  {'i0': 4}, #a[i]
 		  {'i0': 4, 'p0': 4}, #b[i]

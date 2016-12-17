@@ -31,6 +31,5 @@ Siddhartha Chatterjee, Erin Parker, Philip J. Hanlon, and Alvin R. Lebeck. 2001.
 ## Limitations
 
 1. Does not support associativity at the moment.
-2. Does not directly support non-unit stride loops. However such a loop can be easily simulated using some linear math on a unit stride iterator.
-3. Formulae that calculate the accessed memory address must be a linear function of the parameters and iterators.
-4. Assumes that only one cache block is referenced at a time. If a single data item spans 2 different cache blocks, only the first one will be considered as accessed.
+2. Formulae that calculate the accessed memory address must be a linear function of the parameters and iterators.
+3. Assumes that only one cache block is referenced at a time. If a single data item spans 2 different cache blocks, only the first one will be considered as accessed.

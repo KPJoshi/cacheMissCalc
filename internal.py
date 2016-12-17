@@ -37,9 +37,16 @@ setLv0 = (isl.Set.universe(space)
 
 #constraints on the dimensions
 for const in domain:
-	setLv0 = (setLv0.add_constraint(isl.Constraint.ineq_from_names(space, const))
-					.add_constraint(isl.Constraint.ineq_from_names(space,cvtConstrIters(const,'i','j')))
-					.add_constraint(isl.Constraint.ineq_from_names(space,cvtConstrIters(const,'i','k'))))
+	t = const['type']
+	del const['type']
+	if t=='in':
+		setLv0 = (setLv0.add_constraint(isl.Constraint.ineq_from_names(space, const))
+						.add_constraint(isl.Constraint.ineq_from_names(space,cvtConstrIters(const,'i','j')))
+						.add_constraint(isl.Constraint.ineq_from_names(space,cvtConstrIters(const,'i','k'))))
+	else:
+		setLv0 = (setLv0.add_constraint(isl.Constraint.eq_from_names(space, const))
+						.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(const,'i','j')))
+						.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(const,'i','k'))))
 
 #remove possibility of d=e
 setLv0Cpy = (setLv0
@@ -59,7 +66,13 @@ for i in range(references):
 			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 			  .add_constraint(isl.Constraint.eq_from_names(space, {'i'+str(dims-1): 1, 1: -i})))
 	for c in guards[i]:
-		setLv1 = setLv1.add_constraint(isl.Constraint.eq_from_names(space, c))
+		c=c.copy()
+		t = c['type']
+		del c['type']
+		if t=='in':
+			setLv1 = setLv1.add_constraint(isl.Constraint.ineq_from_names(space, c))
+		else:
+			setLv1 = setLv1.add_constraint(isl.Constraint.eq_from_names(space, c))
 	#add lex constraint: j<i
 	setLv1 = addLexConstraint(setLv1,'i','j')
 	#print 'setLv1', i, ':\n', setLv1
@@ -75,7 +88,13 @@ for i in range(references):
 				  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 				  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
 		for c in guards[j]:
-			setLv2 = setLv2.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(c,'i','j')))
+			c=c.copy()
+			t = c['type']
+			del c['type']
+			if t=='in':
+				setLv2 = setLv2.add_constraint(isl.Constraint.ineq_from_names(space,cvtConstrIters(c,'i','j')))
+			else:
+				setLv2 = setLv2.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(c,'i','j')))
 		#print 'setLv2 (1)', i, j, ':\n', setLv2
 		setLv3Agg = isl.Set.empty(space)
 		setLv3Template = setLv2.copy()
@@ -93,7 +112,13 @@ for i in range(references):
 					  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
 					  .add_constraint(isl.Constraint.eq_from_names(space, {'k'+str(dims-1): 1, 1: -k})))
 			for c in guards[k]:
-				setLv3 = setLv3.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(c,'i','k')))
+				c=c.copy()
+				t = c['type']
+				del c['type']
+				if t=='in':
+					setLv3 = setLv3.add_constraint(isl.Constraint.ineq_from_names(space,cvtConstrIters(c,'i','k')))
+				else:
+					setLv3 = setLv3.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(c,'i','k')))
 			#print 'setLv3', i, j, k, ':\n', setLv3
 			setLv3Agg = setLv3Agg.union(setLv3)
 		setLv2 = setLv2.project_out(isl.dim_type.set,dims*2+3,dims)

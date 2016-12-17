@@ -2,32 +2,24 @@
 #A matrix multiplication operation is simulated
 #The size of the square matrices, the no. of bytes of each data item, and the loop order can be easily changed
 
-#input data
+#See input_template.py for an explanation of the input format
 
-nBlocks = 128 #no. of cache blocks
-blockSz = 32 #size of block in bytes
+nBlocks = 128
+blockSz = 32
 
-dims = 3 #dimensions in iteration domain
-params = 0 #no. of parameters
-references = 3 #no. of references to memory locations
+dims = 3
+params = 0
+references = 3
 
 #user constants - use these instead of parameters if you want to use a specific value
 n = 21 #array size
 width = 8 #data size
 order = {'i': 'i0', 'j': 'i1', 'k': 'i2'} #loop order
 
-#inequality constraints on the domain
-#it is expected that the iteration dimensions are i0, i1, ... and the parameters are p0, p1, ...
-#constraining parameters is highly recommended if possible
-domain = [{'i0': 1},{'i0': -1, 1: n-1},{'i1': 1},{'i1': -1, 1: n-1},{'i2': 1},{'i2': -1, 1: n-1}]
+domain = [{'type':'in', 'i0': 1},{'type':'in', 'i0': -1, 1: n-1},{'type':'in', 'i1': 1},{'type':'in', 'i1': -1, 1: n-1},{'type':'in', 'i2': 1},{'type':'in', 'i2': -1, 1: n-1}]
 
-#equality constraints on the domain of individual statements
-#must be a list of lists, one list for each statement, each list containing that statement's constraints
-#for use with imperfect loop nests, as statement guards
 guards = [[],[],[]]
 
-#memory location accessed by each reference
-#representing a linear expression to calculate the memory location accessed by the reference
 refMem = ([
 		  {order['i']: n*width, order['j']: width}, #a[i][j]
 		  {order['i']: n*width, order['k']: width, 1: n*n*width}, #b[i][k]
