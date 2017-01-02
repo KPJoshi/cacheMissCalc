@@ -36,4 +36,3 @@ Siddhartha Chatterjee, Erin Parker, Philip J. Hanlon, and Alvin R. Lebeck. 2001.
 
 1. Does not support associativity at the moment.
 2. Formulae that calculate the accessed memory address must be a linear function of the parameters and iterators.
-3. Assumes that only one cache block is referenced at a time. If a single data item spans 2 different cache blocks, only the first one will be considered as accessed.
