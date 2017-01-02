@@ -26,9 +26,11 @@ domain = [{'type':'in', 'i0': 1},{'type':'in', 'i0': -1, 'p0': 1, 1: -1},{'type'
 guards = [[],[]]
 
 #memory location accessed by each reference
-#representing a linear expression to calculate the memory location accessed by the reference
-#note - no 'type' required here - these are assumed to be equalities
+#there is one tuple for each reference:
+#  the first item is a linear expression to calculate the starting memory location
+#  the second item is the number of bytes of memory accessed - for now, it is required to be constant
+#note - no 'type' required here - the accessed memory addresses are assumed to be [ startAddr , startAddr+size )
 refMem = ([
-		  {'i0': 4}, #a[i]
-		  {'i0': 4, 'p0': 4}, #b[i]
+		  ({'i0': 4}, 4), #a[i]
+		  ({'i0': 4, 'p0': 4}, 4), #b[i]
 ])

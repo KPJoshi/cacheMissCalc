@@ -19,5 +19,5 @@ domain = [{'type':'eq', 'i0': 1, 'i1': -3},{'type':'in', 'i0': 1},{'type':'in', 
 guards = [[],[]]
 
 refMem = ([
-		  {'i0': 4}
+		  ({'i0': 4}, 4)
 ])

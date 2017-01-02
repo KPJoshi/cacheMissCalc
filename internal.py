@@ -11,10 +11,11 @@ dNameSet=[]
 for i in range(dims):
 	string = str(i)
 	dNameSet.append('i'+string)
+dNameSet += ['s']
 for i in range(dims):
 	string = str(i)
 	dNameSet.append('j'+string)
-dNameSet += ['s','d','e']
+dNameSet += ['d','e']
 for i in range(dims):
 	string = str(i)
 	dNameSet.append('k'+string)
@@ -58,8 +59,8 @@ setLv0 = setLv0.subtract(setLv0Cpy)
 
 for i in range(references):
 	#create and add constraint that reference at i maps to cache block s, with free parameter d
-	lowerConstr = createGTConstraint(refMem[i],{'d': nBlocks*blockSz, 's': blockSz},False)
-	upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},refMem[i],True)
+	lowerConstr = createGTConstraint(refMem[i][0],{'d': nBlocks*blockSz, 's': blockSz, 1: 1-refMem[i][1]},False)
+	upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},refMem[i][0],True)
 	#print 'lc', lowerConstr, 'uc', upperConstr
 	setLv1 = (setLv0
 			  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
@@ -80,8 +81,8 @@ for i in range(references):
 		setLv2 = setLv1.copy()
 		#print 'setLv2 (0)', i, j, ':\n', setLv2
 		#create and add constraint that reference at j maps to cache block s, with free parameter e
-		lowerConstr = createGTConstraint(cvtConstrIters(refMem[j],'i','j'),{'e': nBlocks*blockSz, 's': blockSz},False)
-		upperConstr = createGTConstraint({'e': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[j],'i','j'),True)
+		lowerConstr = createGTConstraint(cvtConstrIters(refMem[j][0],'i','j'),{'e': nBlocks*blockSz, 's': blockSz, 1: 1-refMem[j][1]},False)
+		upperConstr = createGTConstraint({'e': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[j][0],'i','j'),True)
 		#print 'lc', lowerConstr, 'uc', upperConstr
 		setLv2 = (setLv2
 				  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
@@ -104,8 +105,8 @@ for i in range(references):
 		for k in range(references):
 			setLv3 = setLv3Template.copy()
 			#create and add constraint that reference at k maps to cache block s, with free parameter d
-			lowerConstr = createGTConstraint(cvtConstrIters(refMem[k],'i','k'),{'d': nBlocks*blockSz, 's': blockSz},False)
-			upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[k],'i','k'),True)
+			lowerConstr = createGTConstraint(cvtConstrIters(refMem[k][0],'i','k'),{'d': nBlocks*blockSz, 's': blockSz, 1: 1-refMem[k][1]},False)
+			upperConstr = createGTConstraint({'d': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[k][0],'i','k'),True)
 			#print 'lc', lowerConstr, 'uc', upperConstr
 			setLv3 = (setLv3
 					  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
@@ -126,7 +127,7 @@ for i in range(references):
 		setLv2 = setLv2.subtract(setLv3Agg)
 		finalSet = finalSet.union(setLv2)
 
-finalSet = finalSet.project_out(isl.dim_type.set,dims,dims+3)
+finalSet = finalSet.project_out(isl.dim_type.set,dims+1,dims+2)
 
 #optional step: simplify the set representation - increases processing time
 finalSet = finalSet.coalesce()

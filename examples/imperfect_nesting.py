@@ -24,6 +24,6 @@ domain = [{'type':'in', 'i0': 1},{'type':'in', 'i0': -1, 1: n-1},{'type':'in', '
 guards = [[{'type':'eq', 'i1': 1}],[]] #execute first statement only when i1=0
 
 refMem = ([
-		  {'i0': 4*n, 'i1': 4}, #a[i][j]
-		  {'i0': 4, 1: 4*n*n}, #b[i]
+		  ({'i0': 4*n, 'i1': 4}, 4), #a[i][j]
+		  ({'i0': 4, 1: 4*n*n}, 4), #b[i]
 ])

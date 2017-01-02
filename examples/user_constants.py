@@ -21,7 +21,7 @@ domain = [{'type':'in', 'i0': 1},{'type':'in', 'i0': -1, 1: n-1},{'type':'in', '
 guards = [[],[],[]]
 
 refMem = ([
-		  {order['i']: n*width, order['j']: width}, #a[i][j]
-		  {order['i']: n*width, order['k']: width, 1: n*n*width}, #b[i][k]
-		  {order['k']: n*width, order['j']: width, 1: 2*n*n*width}, #c[k][j]
+		  ({order['i']: n*width, order['j']: width}, width), #a[i][j]
+		  ({order['i']: n*width, order['k']: width, 1: n*n*width}, width), #b[i][k]
+		  ({order['k']: n*width, order['j']: width, 1: 2*n*n*width}, width), #c[k][j]
 ])
