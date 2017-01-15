@@ -45,6 +45,8 @@ for const in domain:
 
 #print 'setLv0:\n', setLv0
 
+setLv1Agg = isl.Set.empty(space)
+
 for i in range(references):
 	#create and add constraint that reference at i maps to cache block s, with free parameter d
 	lowerConstr = createGTConstraint(refMem[i][0],{'d': nBlocks*blockSz, 's': blockSz, 1: 1-refMem[i][1]},False)
@@ -62,38 +64,40 @@ for i in range(references):
 			setLv1 = setLv1.add_constraint(isl.Constraint.ineq_from_names(space, c))
 		else:
 			setLv1 = setLv1.add_constraint(isl.Constraint.eq_from_names(space, c))
-	#print 'setLv1', i, ':\n', setLv1
-	setLv2Agg = isl.Set.empty(space)
-	setLv2Template = setLv1.copy()
-	#add lex constraint: j<i
-	setLv2Template = addLexConstraint(setLv2Template,'i','j')
-	for j in range(references):
-		setLv2 = setLv2Template.copy()
-		#print 'setLv2 (0)', i, j, ':\n', setLv2
-		#create and add constraint that reference at j maps to cache block s, with free parameter e
-		lowerConstr = createGTConstraint(cvtConstrIters(refMem[j][0],'i','j'),{'e': nBlocks*blockSz, 's': blockSz, 1: 1-refMem[j][1]},False)
-		upperConstr = createGTConstraint({'e': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[j][0],'i','j'),True)
-		#print 'lc', lowerConstr, 'uc', upperConstr
-		setLv2 = (setLv2
-				  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
-				  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
-				  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
-		for c in guards[j]:
-			c=c.copy()
-			t = c['type']
-			del c['type']
-			if t=='in':
-				setLv2 = setLv2.add_constraint(isl.Constraint.ineq_from_names(space,cvtConstrIters(c,'i','j')))
-			else:
-				setLv2 = setLv2.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(c,'i','j')))
-		#print 'setLv2 (1)', i, j, ':\n', setLv2
-		setLv2Agg = setLv2Agg.union(setLv2)
-	setLv1 = setLv1.project_out(isl.dim_type.set,dims+2,dims+1)
-	setLv2Agg = setLv2Agg.project_out(isl.dim_type.set,dims+2,dims+1)
-	setLv1 = setLv1.subtract(setLv2Agg)
-	finalSet = finalSet.union(setLv1)
+	setLv1Agg = setLv1Agg.union(setLv1)
 
-finalSet = finalSet.project_out(isl.dim_type.set,dims+1,1)
+setLv1 = setLv1Agg
+#print 'setLv1', i, ':\n', setLv1
+setLv2Agg = isl.Set.empty(space)
+setLv2Template = setLv1.copy()
+#add lex constraint: j<i
+setLv2Template = addLexConstraint(setLv2Template,'i','j')
+for j in range(references):
+	setLv2 = setLv2Template.copy()
+	#print 'setLv2 (0)', i, j, ':\n', setLv2
+	#create and add constraint that reference at j maps to cache block s, with free parameter e
+	lowerConstr = createGTConstraint(cvtConstrIters(refMem[j][0],'i','j'),{'e': nBlocks*blockSz, 's': blockSz, 1: 1-refMem[j][1]},False)
+	upperConstr = createGTConstraint({'e': nBlocks*blockSz, 's': blockSz, 1:blockSz},cvtConstrIters(refMem[j][0],'i','j'),True)
+	#print 'lc', lowerConstr, 'uc', upperConstr
+	setLv2 = (setLv2
+			  .add_constraint(isl.Constraint.ineq_from_names(space, lowerConstr))
+			  .add_constraint(isl.Constraint.ineq_from_names(space, upperConstr))
+			  .add_constraint(isl.Constraint.eq_from_names(space, {'j'+str(dims-1): 1, 1: -j})))
+	for c in guards[j]:
+		c=c.copy()
+		t = c['type']
+		del c['type']
+		if t=='in':
+			setLv2 = setLv2.add_constraint(isl.Constraint.ineq_from_names(space,cvtConstrIters(c,'i','j')))
+		else:
+			setLv2 = setLv2.add_constraint(isl.Constraint.eq_from_names(space,cvtConstrIters(c,'i','j')))
+	#print 'setLv2 (1)', i, j, ':\n', setLv2
+	setLv2Agg = setLv2Agg.union(setLv2)
+setLv1 = setLv1.project_out(isl.dim_type.set,dims+2,dims+1)
+setLv2Agg = setLv2Agg.project_out(isl.dim_type.set,dims+2,dims+1)
+setLv1 = setLv1.subtract(setLv2Agg)
+
+finalSet = setLv1.project_out(isl.dim_type.set,dims+1,1)
 
 #optional step: simplify the set representation - increases processing time
 finalSet = finalSet.coalesce()
